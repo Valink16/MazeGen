@@ -3,10 +3,14 @@ try:
     from pygame import draw, font, Rect
 except ImportError:
     print("[WARNING] Could not import pygame, GUI will be disabled")
+
 from random import randint, random
 
-font.init()
-textFont = font.Font(None, 30)
+try:
+    font.init()
+    textFont = font.Font(None, 30)
+except NameError:
+    pass
 
 # TODO: Add an array of indexes to choose from for the walls
 
