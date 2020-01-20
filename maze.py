@@ -1,5 +1,8 @@
 import unionfind as uf
-from pygame import draw, font, Rect
+try:
+    from pygame import draw, font, Rect
+except ImportError:
+    print("[WARNING] Could not import pygame, GUI will be disabled")
 from random import randint, random
 
 font.init()
@@ -8,12 +11,12 @@ textFont = font.Font(None, 30)
 # TODO: Add an array of indexes to choose from for the walls
 
 class Maze:
-    def __init__(self, w, h, window):
+    def __init__(self, w, h, window=None):
         self.w = w
         self.h = h
         self.window = window
 
-        self.setCsize()
+        if window: self.setCsize()
 
         self.cells = [uf.Node(i) for i in range(w * h)]
         verticalWalls = [True for _i in range((w + 1) * h)]
@@ -43,7 +46,7 @@ class Maze:
             self.cw = e.w / self.w
             self.ch = e.h / self.h
 
-    def show_unoptimized(self):
+    def show_unoptimized(self): # Requires pygame, will crash if launched without it
         for i in range(len(self.walls) - self.hwStartIndex):
             if self.walls[i]:
                 pos = Rect(i % (self.w + 1) * self.cw, i // (self.w + 1) * self.ch, 0, 0)
@@ -95,3 +98,28 @@ class Maze:
 
     def isPerfect(self):
         return self.w * self.h - 1 == self.openWalls
+
+    # Generates a 2D grid with (or non-)navigeable "cells", represented by booleans
+    def asGrid(self):
+        gridW = self.w * 2 + 1
+        gridH = self.h * 2 + 1
+        grid = [[True for i in range(gridW)] for j in range(gridH)]
+
+        for y in range(len(grid)): # Freeing up the cells
+            for x in range(len(grid[y])):
+                if y % 2 == 1 and x % 2 == 1: # Is a cell
+                    grid[y][x] = False
+
+        for wIndex in range(self.hwStartIndex): # Vertical walls
+            x = wIndex % (self.w + 1) * 2
+            y = wIndex // (self.w + 1) * 2 + 1
+            #print("Setting vertical wall @ {} to {}".format((x, y), self.walls[wIndex]))
+            grid[y][x] = self.walls[wIndex]
+
+        for wIndex in range(0, len(self.walls) - self.hwStartIndex): # Horizontal walls
+            x = wIndex % (self.w) * 2 + 1
+            y = wIndex // (self.w) * 2
+            #print("Setting horizontal wall @ {} to {}".format((x, y), self.walls[wIndex + self.hwStartIndex]))
+            grid[y][x] = self.walls[wIndex + self.hwStartIndex]
+            
+        return grid

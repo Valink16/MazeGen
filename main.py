@@ -8,16 +8,16 @@ setrecursionlimit(2000)
 
 pygame.display.init()
 pygame.font.init()
-window = pygame.display.set_mode(flags=pygame.RESIZABLE)
+window = pygame.display.set_mode((200, 200), flags=pygame.RESIZABLE)
 font = pygame.font.Font(None, 30)
 gameClock = pygame.time.Clock()
 running = True
 successPrinted = False
 fCount = 0
 
-maze = maze.Maze(200, 200, window)
-solveRate = 20
-solveSteps = len(maze.cells) // solveRate # Account of steps executed each `solveRate` frames
+maze = maze.Maze(2, 2, window)
+solveRate = 1
+solveSteps = 1 # Account of steps executed each `solveRate` frames
 print("Stepping {} times each {} frames".format(solveSteps, solveRate))
 
 print(maze)
@@ -29,7 +29,9 @@ while running:
     if e.type == pygame.QUIT:
         running = False
     if e.type == pygame.VIDEORESIZE:
-        maze.setCsize(e=e)
+        #maze.setCsize(e=e)
+        maze.cw = 30
+        maze.ch = 30
         window.fill((255, 255, 255))
         maze.show_unoptimized()
         pygame.display.flip()
@@ -45,4 +47,4 @@ while running:
     elif maze.isPerfect():
         if not successPrinted:
             successPrinted = True
-            print("Created perfect maze !")        
+            print("Created perfect maze !")    
